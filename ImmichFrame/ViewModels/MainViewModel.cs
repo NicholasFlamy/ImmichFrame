@@ -1,4 +1,5 @@
-﻿using Avalonia.Media.Imaging;
+﻿using Avalonia.Controls;
+using Avalonia.Media.Imaging;
 using CommunityToolkit.Mvvm.ComponentModel;
 using ImmichFrame.Exceptions;
 using ImmichFrame.Helpers;
@@ -22,6 +23,7 @@ public partial class MainViewModel : NavigatableViewModelBase
     private PreloadedAsset? NextAsset;
     private AssetHelper _assetHelper;
     private CultureInfo culture;
+    public static TopLevel MainTopLevel;
 
     public ICommand NextImageCommand { get; set; }
     public ICommand PreviousImageCommand { get; set; }
@@ -29,6 +31,8 @@ public partial class MainViewModel : NavigatableViewModelBase
     public ICommand NavigateSettingsPageCommand { get; set; }
     public MainViewModel()
     {
+        //MainTopLevel = TopLevel.GetTopLevel(GetUserControl());
+
         settings = Settings.CurrentSettings;
         _assetHelper = new AssetHelper();
         culture = new CultureInfo(settings.Language);

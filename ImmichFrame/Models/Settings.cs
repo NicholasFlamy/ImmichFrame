@@ -1,6 +1,12 @@
-﻿using Avalonia.Platform.Storage;
+﻿using Avalonia;
+using Avalonia.Controls;
+using Avalonia.Controls.ApplicationLifetimes;
+using Avalonia.Platform.Storage;
 using ImmichFrame.Exceptions;
 using ImmichFrame.Helpers;
+using ImmichFrame.ViewModels;
+using ImmichFrame.Views;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -72,9 +78,13 @@ namespace ImmichFrame.Models
                 {
                     basePath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
                 }
-                else
+                else if(PlatformDetector.IsDesktop())
                 {
                     basePath = AppDomain.CurrentDomain.BaseDirectory;
+                }
+                else
+                {
+                    basePath = string.Empty;
                 }
                 return Path.Combine(basePath, "Settings.json");
             }
@@ -114,7 +124,32 @@ namespace ImmichFrame.Models
         }
         private static Settings ParseFromJson()
         {
-            var json = File.ReadAllText(Settings.JsonSettingsPath);
+            string? json = string.Empty;
+            if (JsonSettingsPath == "Settings.json")
+            {
+                var topLevel = MainViewModel.MainTopLevel;
+                if (topLevel != null)
+                {
+
+                    // Open the file bookmark and get the file handle
+                    var file = topLevel.StorageProvider.OpenFileBookmarkAsync("settings").GetAwaiter().GetResult();
+
+
+                    if (file != null)
+                    {
+                        // Save the serialized settings to the file
+                        using (var stream = file.OpenReadAsync().GetAwaiter().GetResult())
+                        using (var reader = new StreamReader(stream))
+                        {
+                            json = reader.ReadToEndAsync().GetAwaiter().GetResult(); 
+                        }
+                    }
+                }
+            }
+            else
+            {
+                json = File.ReadAllText(Settings.JsonSettingsPath);
+            }
             JsonDocument doc;
             try
             {
@@ -263,10 +298,39 @@ namespace ImmichFrame.Models
             return settings;
         }
 
-        public static void SaveSettings(Settings settings)
+        public static async void SaveSettings(Settings settings)
         {
-            var json = JsonSerializer.Serialize(settings, new JsonSerializerOptions { WriteIndented = true });
-            File.WriteAllText(Settings.JsonSettingsPath, json);
+            if (JsonSettingsPath == "Settings.json")
+            {
+                var topLevel = MainViewModel.MainTopLevel;
+                if (topLevel != null)
+                {
+                    Console.WriteLine("ROB- not null");
+                    string json = JsonSerializer.Serialize(settings, new JsonSerializerOptions { WriteIndented = true });
+
+                    // Open the file bookmark and get the file handle
+                    var file = await topLevel.StorageProvider.OpenFileBookmarkAsync("settings");
+
+                    if (file != null)
+                    {
+                        // Save the serialized settings to the file
+                        using (var stream = await file.OpenWriteAsync())
+                        using (var writer = new StreamWriter(stream))
+                        {
+                            await writer.WriteAsync(json);
+                        }
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("ROB- stupid thing is null");
+                }
+            }
+            else
+            {
+                var json = JsonSerializer.Serialize(settings, new JsonSerializerOptions { WriteIndented = true });
+                File.WriteAllText(Settings.JsonSettingsPath, json);
+            }
         }
         public static async Task BackupSettings(IStorageFile file)
         {
@@ -285,7 +349,7 @@ namespace ImmichFrame.Models
             _settings = settings;
             _settings!.Validate();
         }
-        private static void CreateDefaultSettingsFile()
+        private static async void CreateDefaultSettingsFile()
         {
             var defaultSettings = new Settings
             {
@@ -317,8 +381,33 @@ namespace ImmichFrame.Models
                 WeatherApiKey = "",
                 Language = "en"
             };
-            string json = JsonSerializer.Serialize(defaultSettings, new JsonSerializerOptions { WriteIndented = true });
-            File.WriteAllText(JsonSettingsPath, json);
+            if(JsonSettingsPath == "Setting.json")
+            {
+                var topLevel = MainViewModel.MainTopLevel;
+
+                if (topLevel != null)
+                {
+                    string json = JsonSerializer.Serialize(defaultSettings, new JsonSerializerOptions { WriteIndented = true });
+
+                    // Open the file bookmark and get the file handle
+                    var file = await topLevel.StorageProvider.OpenFileBookmarkAsync("settings");
+
+                    if (file != null)
+                    {
+                        // Save the serialized settings to the file
+                        using (var stream = await file.OpenWriteAsync())
+                        using (var writer = new StreamWriter(stream))
+                        {
+                            await writer.WriteAsync(json);
+                        }
+                    }
+                }
+            }
+            else
+            {
+                string json = JsonSerializer.Serialize(defaultSettings, new JsonSerializerOptions { WriteIndented = true });
+                File.WriteAllText(JsonSettingsPath, json);
+            }
         }
     }
 }
