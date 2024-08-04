@@ -125,7 +125,7 @@ namespace ImmichFrame.ViewModels
         }
         private async void BackupAction()
         {
-            var backupFile = await ShowSaveFileDialog(true);
+            var backupFile = await FileHelper.ShowSaveFileDialog(true);
             if (backupFile is not null)
             {
                 await Settings.BackupSettings(backupFile);
@@ -133,49 +133,49 @@ namespace ImmichFrame.ViewModels
         }
         private async void RestoreAction()
         {
-            var restoreFile = await ShowOpenFileDialog();
+            var restoreFile = await FileHelper.ShowOpenFileDialog();
             if (restoreFile is not null)
             {
                 await Settings.RestoreSettings(restoreFile);
                 Settings = Settings.CurrentSettings;
             }
         }
-        public async Task<IStorageFile?> ShowSaveFileDialog(bool showOverwritePrompt)
-        {
-            var topLevel = TopLevel.GetTopLevel(GetUserControl!());
-            if (topLevel != null)
-            {
-                var file = await topLevel.StorageProvider.SaveFilePickerAsync(new FilePickerSaveOptions
-                {
-                    Title = "Save File",
-                    SuggestedFileName = "ImmichFrameSettings.json",
-                    ShowOverwritePrompt = showOverwritePrompt
-                });
-                if (file is not null)
-                {
-                    return file;
-                }
-            }
-            return null;
-        }
-        public async Task<IStorageFile?> ShowOpenFileDialog()
-        {
-            var topLevel = TopLevel.GetTopLevel(GetUserControl!());
-            if (topLevel != null)
-            {
-                var file = await topLevel.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
-                {
-                    Title = "Open File",
-                    AllowMultiple = false,
-                    SuggestedFileName = "ImmichFrameSettings.json",
-                });
-                if (file is not null)
-                {
-                    return file[0];
-                }
-            }
-            return null;
-        }
+        //public async Task<IStorageFile?> ShowSaveFileDialog(bool showOverwritePrompt)
+        //{
+        //    var topLevel = TopLevel.GetTopLevel(GetUserControl!());
+        //    if (topLevel != null)
+        //    {
+        //        var file = await topLevel.StorageProvider.SaveFilePickerAsync(new FilePickerSaveOptions
+        //        {
+        //            Title = "Save File",
+        //            SuggestedFileName = "ImmichFrameSettings.json",
+        //            ShowOverwritePrompt = showOverwritePrompt
+        //        });
+        //        if (file is not null)
+        //        {
+        //            return file;
+        //        }
+        //    }
+        //    return null;
+        //}
+        //public async Task<IStorageFile?> ShowOpenFileDialog()
+        //{
+        //    var topLevel = TopLevel.GetTopLevel(GetUserControl!());
+        //    if (topLevel != null)
+        //    {
+        //        var file = await topLevel.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
+        //        {
+        //            Title = "Open File",
+        //            AllowMultiple = false,
+        //            SuggestedFileName = "ImmichFrameSettings.json",
+        //        });
+        //        if (file is not null)
+        //        {
+        //            return file[0];
+        //        }
+        //    }
+        //    return null;
+        //}
     }
 
     public class ListItem

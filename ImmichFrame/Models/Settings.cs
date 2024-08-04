@@ -124,26 +124,28 @@ namespace ImmichFrame.Models
         }
         private static Settings ParseFromJson()
         {
+            Console.WriteLine("ROB- ParseFromJson");
+
             string? json = string.Empty;
             if (JsonSettingsPath == "Settings.json")
             {
-                var topLevel = MainViewModel.MainTopLevel;
+                var topLevel = WindowView.MainTopLevel;
                 if (topLevel != null)
                 {
-
-                    // Open the file bookmark and get the file handle
-                    var file = topLevel.StorageProvider.OpenFileBookmarkAsync("settings").GetAwaiter().GetResult();
-
-
-                    if (file != null)
-                    {
-                        // Save the serialized settings to the file
-                        using (var stream = file.OpenReadAsync().GetAwaiter().GetResult())
-                        using (var reader = new StreamReader(stream))
-                        {
-                            json = reader.ReadToEndAsync().GetAwaiter().GetResult(); 
-                        }
-                    }
+                    //var bookmarks = topLevel.StorageProvider.SaveBookmarkAsync()
+                    //// Open the file bookmark and get the file handle
+                    //var file = topLevel.StorageProvider.OpenFileBookmarkAsync("settings").GetAwaiter().GetResult();
+                    //var tester = topLevel.StorageProvider.;
+                    //if (file != null)
+                    //{
+                    //    Console.WriteLine("ROB- fileNotNull");
+                    //    // Save the serialized settings to the file
+                    //    using (var stream = file.OpenReadAsync().GetAwaiter().GetResult())
+                    //    using (var reader = new StreamReader(stream))
+                    //    {
+                    //        json = reader.ReadToEndAsync().GetAwaiter().GetResult(); 
+                    //    }
+                    //}
                 }
             }
             else
@@ -302,7 +304,7 @@ namespace ImmichFrame.Models
         {
             if (JsonSettingsPath == "Settings.json")
             {
-                var topLevel = MainViewModel.MainTopLevel;
+                var topLevel = WindowView.MainTopLevel;
                 if (topLevel != null)
                 {
                     Console.WriteLine("ROB- not null");
@@ -383,7 +385,7 @@ namespace ImmichFrame.Models
             };
             if(JsonSettingsPath == "Setting.json")
             {
-                var topLevel = MainViewModel.MainTopLevel;
+                var topLevel = WindowView.MainTopLevel;
 
                 if (topLevel != null)
                 {
