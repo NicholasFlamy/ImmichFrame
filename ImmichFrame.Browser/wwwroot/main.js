@@ -9,5 +9,13 @@ const dotnetRuntime = await dotnet
     .create();
 
 const config = dotnetRuntime.getConfig();
+// Function to save data to local storage
+function saveToLocalStorage(key, data) {
+    localStorage.setItem(key, data);
+}
 
+// Function to get data from local storage
+function getFromLocalStorage(key) {
+    return localStorage.getItem(key);
+}
 await dotnetRuntime.runMain(config.mainAssemblyName, [globalThis.location.href]);

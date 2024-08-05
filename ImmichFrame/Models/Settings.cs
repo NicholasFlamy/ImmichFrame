@@ -16,6 +16,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace ImmichFrame.Models
 {
@@ -78,7 +79,7 @@ namespace ImmichFrame.Models
                 {
                     basePath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
                 }
-                else if(PlatformDetector.IsDesktop())
+                else if (PlatformDetector.IsDesktop())
                 {
                     basePath = AppDomain.CurrentDomain.BaseDirectory;
                 }
@@ -124,29 +125,12 @@ namespace ImmichFrame.Models
         }
         private static Settings ParseFromJson()
         {
-            Console.WriteLine("ROB- ParseFromJson");
 
             string? json = string.Empty;
             if (JsonSettingsPath == "Settings.json")
             {
-                var topLevel = WindowView.MainTopLevel;
-                if (topLevel != null)
-                {
-                    //var bookmarks = topLevel.StorageProvider.SaveBookmarkAsync()
-                    //// Open the file bookmark and get the file handle
-                    //var file = topLevel.StorageProvider.OpenFileBookmarkAsync("settings").GetAwaiter().GetResult();
-                    //var tester = topLevel.StorageProvider.;
-                    //if (file != null)
-                    //{
-                    //    Console.WriteLine("ROB- fileNotNull");
-                    //    // Save the serialized settings to the file
-                    //    using (var stream = file.OpenReadAsync().GetAwaiter().GetResult())
-                    //    using (var reader = new StreamReader(stream))
-                    //    {
-                    //        json = reader.ReadToEndAsync().GetAwaiter().GetResult(); 
-                    //    }
-                    //}
-                }
+                json = JavaScriptInterop.GetFromLocalStorageAsync("ImmichFrameSettings").GetAwaiter().GetResult();
+                Console.WriteLine("ROB- ParseFromJson");
             }
             else
             {
@@ -383,31 +367,16 @@ namespace ImmichFrame.Models
                 WeatherApiKey = "",
                 Language = "en"
             };
-            if(JsonSettingsPath == "Setting.json")
+            string json = JsonSerializer.Serialize(defaultSettings, new JsonSerializerOptions { WriteIndented = true });
+            if (JsonSettingsPath == "Settings.json")
             {
-                var topLevel = WindowView.MainTopLevel;
-
-                if (topLevel != null)
-                {
-                    string json = JsonSerializer.Serialize(defaultSettings, new JsonSerializerOptions { WriteIndented = true });
-
-                    // Open the file bookmark and get the file handle
-                    var file = await topLevel.StorageProvider.OpenFileBookmarkAsync("settings");
-
-                    if (file != null)
-                    {
-                        // Save the serialized settings to the file
-                        using (var stream = await file.OpenWriteAsync())
-                        using (var writer = new StreamWriter(stream))
-                        {
-                            await writer.WriteAsync(json);
-                        }
-                    }
-                }
+                Console.WriteLine("ROB- CreateJson");
+                await JavaScriptInterop.SaveToLocalStorageAsync("ImmichFrameSettings", json);
+                Console.WriteLine("ROB- SavedJson");
             }
             else
             {
-                string json = JsonSerializer.Serialize(defaultSettings, new JsonSerializerOptions { WriteIndented = true });
+                
                 File.WriteAllText(JsonSettingsPath, json);
             }
         }

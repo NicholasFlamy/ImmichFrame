@@ -64,7 +64,7 @@
       <StackPanel Name="stackPanel" Orientation="Vertical" Margin="10" >
         <StackPanel>
           <TextBlock Text="ImmichServerUrl"/>
-          <TextBox x:Name="txtImmichServerUrl" Text="{Binding Settings.ImmichServerUrl}" TabIndex="0" />
+          <TextBox x:Name="txtImmichServerUrl" Text="{Binding Settings.ImmichServerUrl}" Watermark="http://192.168.0.100:2283" TabIndex="0" />
         </StackPanel>
         <StackPanel>
           <TextBlock Text="ApiKey"/>
